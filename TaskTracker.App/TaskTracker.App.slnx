@@ -3,6 +3,7 @@
     <File Path="LR2_Report.md" />
     <File Path="LR3_Report.md" />
     <File Path="LR4_Report.md" />
+    <File Path="LR5_Report.md" />
     <File Path="TZ.md" />
   </Folder>
   <Project Path="TaskTracker.App/TaskTracker.App.csproj" />
