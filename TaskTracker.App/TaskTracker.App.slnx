@@ -3,4 +3,5 @@
     <File Path="TZ.md" />
   </Folder>
   <Project Path="TaskTracker.App/TaskTracker.App.csproj" />
+  <Project Path="TaskTracker.Core/TaskTracker.Core.csproj" />
 </Solution>
