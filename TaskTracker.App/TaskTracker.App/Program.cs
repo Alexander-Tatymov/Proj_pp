@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Microsoft.VisualBasic.FileIO;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using TaskTracker.Core.Models;
 using TaskTracker.Core.Services;
-using TaskStatus = TaskTracker.Core.Models.TaskStatus;
 using TaskTracker.Storage.Services;
+using TaskStatus = TaskTracker.Core.Models.TaskStatus;
 
 var dataFilePath = Path.Combine(AppContext.BaseDirectory, "data", "tasks.json");
 // Хранилище JSON
@@ -24,6 +25,22 @@ static bool TryReadInt(string prompt, out int value)
     return int.TryParse(text, out value);
 }
 
+static void PrintTasks(List<TaskItem> tasks)
+{
+    if (tasks.Count == 0)
+    {
+        Console.WriteLine("Ничего не найдено.");
+        return;
+    }
+    Console.WriteLine("Список задач:");
+    foreach (var t in tasks)
+    {
+        Console.WriteLine($"{t.Id}. {t.Title} [{t.Status}]");
+        if (!string.IsNullOrWhiteSpace(t.Description))
+            Console.WriteLine($" Описание: {t.Description}");
+    }
+}
+
 while (true)
 {
     Console.WriteLine();
@@ -34,6 +51,9 @@ while (true)
     Console.WriteLine("3) Изменить статус задачи");
     Console.WriteLine("4) Удалить задачу");
     Console.WriteLine("5) Редактировать задачу");
+    Console.WriteLine("6) Поиск по названию");
+    Console.WriteLine("7) Фильтр по статусу");
+    Console.WriteLine("8) Сортировка списка");
     Console.WriteLine("0) Выход");
     Console.WriteLine("----------------");
     Console.Write("Выберите пункт меню: ");
@@ -75,6 +95,10 @@ while (true)
             Console.WriteLine("Список задач пуст.");
             continue;
         }
+
+        PrintTasks(tasks);
+        continue;
+
         Console.WriteLine("Список задач:");
         foreach (var t in tasks)
         {
@@ -212,5 +236,71 @@ while (true)
         }
         continue;
     }
+
+    if (input == "6")
+    {
+        Console.Write("Введите текст для поиска: ");
+        var query = Console.ReadLine() ?? "";
+        var found = service.SearchByTitle(query);
+        PrintTasks(found);
+        continue;
+    }
+
+    if (input == "7")
+    {
+        Console.WriteLine("Выберите статус для фильтра:");
+        Console.WriteLine("0 - All (Показать всё)");
+        Console.WriteLine("1 - New");
+        Console.WriteLine("2 - InProgress");
+        Console.WriteLine("3 - Done");
+        if (!TryReadInt("Введите вариант (0/1/2/3): ", out var option))
+        {
+            Console.WriteLine("Ошибка: нужно число 0/1/2/3.");
+            continue;
+        }
+        TaskStatus? status = option switch
+        {
+            0 => (TaskStatus?)null,
+            1 => TaskStatus.New,
+            2 => TaskStatus.InProgress,
+            3 => TaskStatus.Done,
+            _ => (TaskStatus?)null
+        };
+
+        if (option < 0 || option > 3)
+        {
+            Console.WriteLine("Ошибка: выберите 0, 1, 2 или 3.");
+            continue;
+        }
+        var filtered = service.FilterByStatus(status);
+        PrintTasks(filtered);
+        continue;
+    }
+
+    if (input == "8")
+    {
+        Console.WriteLine("Выберите сортировку:");
+        Console.WriteLine("1 - по Id (по возрастанию)");
+        Console.WriteLine("2 - по Id (по убыванию)");
+        Console.WriteLine("3 - по статусу, затем по Id");
+        if (!TryReadInt("Введите вариант (1/2/3): ", out var option))
+        {
+            Console.WriteLine("Ошибка: нужно число 1/2/3.");
+            continue;
+        }
+        List<TaskItem> sorted;
+        if (option == 1) sorted = service.SortById(true);
+        else if (option == 2) sorted = service.SortById(false);
+        else if (option == 3) sorted = service.SortByStatusThenId();
+else
+        {
+            Console.WriteLine("Ошибка: выберите 1, 2 или 3.");
+            continue;
+        }
+        PrintTasks(sorted);
+        continue;
+    }
+
+
 
 }
