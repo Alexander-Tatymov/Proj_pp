@@ -9,40 +9,38 @@ namespace TaskTracker.Core.Services;
 
 public class TaskService
 {
-    private readonly List<TaskItem> _tasks = new();
-    private int _nextId = 1;
+    private readonly List<TaskItem> _tasks;
+    private int _nextId;
+    public TaskService(List<TaskItem>? initialTasks = null)
+    {
+        _tasks = initialTasks ?? new List<TaskItem>();
+        // следующий Id = максимальный Id + 1
+        _nextId = _tasks.Count == 0 ? 1 : _tasks.Max(t => t.Id) + 1;
+    }
     public TaskItem Add(string title)
     {
         if (string.IsNullOrWhiteSpace(title))
             throw new ArgumentException("Название не может быть пустым.");
-            var task = new TaskItem
-            {
-                Id = _nextId++,
-                Title = title.Trim(),
-                Status = TaskStatus.New
-            };
+        var task = new TaskItem
+        {
+            Id = _nextId++,
+            Title = title.Trim(),
+            Status = TaskStatus.New
+        };
         _tasks.Add(task);
-    
-            return task;
+        return task;
     }
 
-    public object Add(object title)
+public List<TaskItem> GetAll()
     {
-        throw new NotImplementedException();
+        return _tasks.ToList();
     }
-
-    public List<TaskItem> GetAll()
-    {
-        // Возвращаем копию, чтобы внешний код не ломал список
-    return _tasks.ToList();
-    }
-
     private TaskItem GetExisting(int id)
     {
         var task = _tasks.FirstOrDefault(t => t.Id == id);
         if (task is null)
             throw new ArgumentException($"Задача с Id={id} не найдена.");
-        return task;
+    return task;
     }
     public TaskItem ChangeStatus(int id, TaskStatus newStatus)
     {
