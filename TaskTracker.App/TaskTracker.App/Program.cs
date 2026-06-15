@@ -5,6 +5,7 @@ using System.Text;
 using TaskTracker.Core.Models;
 using TaskTracker.Core.Services;
 using TaskTracker.Storage.Services;
+using TaskTracker.Core.Validation;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using TaskStatus = TaskTracker.Core.Models.TaskStatus;
 
@@ -387,6 +388,24 @@ Console.WriteLine("Ошибка: путь пустой.");
         {
             var importStorage = new JsonTaskStorage(importPath);
             var importedTasks = importStorage.Load();
+            // Валидация импортируемых задач
+            bool ok = true;
+            for (int i = 0; i < importedTasks.Count; i++)
+            {
+                var t = importedTasks[i];
+                var error = TaskValidator.Validate(t);
+                if (error != null)
+                {
+                    Console.WriteLine($"Ошибка импорта: задача #{i + 1} не прошла проверку: { error}");
+                ok = false;
+                    break;
+                }
+            }
+            if (!ok)
+            {
+                Console.WriteLine("Импорт отменён.");
+                continue;
+            }
             // Заменяем задачи в сервисе
             service.ReplaceAll(importedTasks);
             // Сохраняем в основной файл data/tasks.json
