@@ -1,6 +1,10 @@
-﻿using TaskTracker.Core.Models;
-var tasks = new List<TaskItem>();
-var nextId = 1;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using TaskTracker.Core.Models;
+using TaskTracker.Core.Services;
+
+var service = new TaskService();
 
 while (true)
 {
@@ -13,35 +17,37 @@ while (true)
     Console.WriteLine("----------------");
     Console.Write("Выберите пункт меню: ");
     var input = Console.ReadLine();
+
     if (input == "0")
     {
         Console.WriteLine("Выход...");
         break;
     }
+
     if (input == "1")
     {
-        Console.Write("Введите название задачи: ");
-        var title = Console.ReadLine() ?? "";
-        // Валидация: нельзя пустое
-    
-if (string.IsNullOrWhiteSpace(title))
+        try
         {
-            Console.WriteLine("Ошибка: название не может быть пустым.");
-            continue;
+            Console.Write("Введите название задачи: ");
+            var title = Console.ReadLine();
+
+            if (string.IsNullOrWhiteSpace(title))
+            {
+                Console.WriteLine("Ошибка: название задачи не может быть пустым.");
+                continue;
+            }
+
+            var task = service.Add(title);
+            Console.WriteLine($"Задача добавлена: #{task.Id} {task.Title} [{task.Status}]");
         }
-        var task = new TaskItem
+        catch (ArgumentException ex)
         {
-            Id = nextId,
-            Title = title.Trim(),
-            Status = TaskTracker.Core.Models.TaskStatus.New
-        };
-        nextId++;
-        tasks.Add(task);
-        Console.WriteLine($"Задача добавлена: #{task.Id} {task.Title} [{task.Status}]");
-        continue;
+            Console.WriteLine("Ошибка: " + ex.Message);
+        }
     }
-    if (input == "2")
+    else if (input == "2")
     {
+        var tasks = service.GetAll();
         if (tasks.Count == 0)
         {
             Console.WriteLine("Список задач пуст.");
@@ -52,8 +58,9 @@ if (string.IsNullOrWhiteSpace(title))
         {
             Console.WriteLine($"{t.Id}. {t.Title} [{t.Status}]");
         }
-    
-        continue;
     }
-    Console.WriteLine("Неизвестная команда. Введите 1, 2 или 0.");
+    else
+    {
+        Console.WriteLine("Неизвестная команда. Введите 1, 2 или 0.");
+    }
 }
