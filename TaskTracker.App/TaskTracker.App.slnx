@@ -6,4 +6,5 @@
   </Folder>
   <Project Path="TaskTracker.App/TaskTracker.App.csproj" />
   <Project Path="TaskTracker.Core/TaskTracker.Core.csproj" />
+  <Project Path="TaskTracker.Storage/TaskTracker.Storage.csproj" />
 </Solution>
