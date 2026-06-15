@@ -78,6 +78,8 @@ while (true)
         foreach (var t in tasks)
         {
             Console.WriteLine($"{t.Id}. {t.Title} [{t.Status}]");
+            if (!string.IsNullOrWhiteSpace(t.Description))
+                Console.WriteLine($" Описание: {t.Description}");
         }
     }
     else
