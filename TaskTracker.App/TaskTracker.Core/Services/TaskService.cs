@@ -53,4 +53,15 @@ public List<TaskItem> GetAll()
         var task = GetExisting(id);
         _tasks.Remove(task);
     }
+
+    public TaskItem Update(int id, string newTitle, string newDescription)
+    {
+
+if (string.IsNullOrWhiteSpace(newTitle))
+            throw new ArgumentException("Название не может быть пустым.");
+            var task = GetExisting(id);
+            task.Title = newTitle.Trim();
+            task.Description = (newDescription ?? "").Trim();
+            return task;
+    }
 }
