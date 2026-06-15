@@ -1,3 +1,6 @@
 <Solution>
+  <Folder Name="/docs/">
+    <File Path="TZ.md" />
+  </Folder>
   <Project Path="TaskTracker.App/TaskTracker.App.csproj" />
 </Solution>
